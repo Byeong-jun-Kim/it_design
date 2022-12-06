@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: test
+  labels:
+    app: test
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  selector:
+    matchLabels:
+      app: test
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - args:
+        - "app.main:app"
+        - "--host"
+        - "0.0.0.0"
+        - "--port"
+        - "30002"
+        command:
+        - uvicorn
+        workingDir: /ROOT
+        name: test
+        image: "asia-northeast3-docker.pkg.dev/lutra-340809/study/bj:fastapi-9"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 30002
+          name: test-port
+          protocol: TCP
+        securityContext:
+          privileged: false
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: test-port
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: test-port
+          initialDelaySeconds: 10
+          periodSeconds: 20
+      serviceAccountName: default
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 45
+  progressDeadlineSeconds: 600
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test
+  namespace: test
+  labels:
+    app: test
+spec:
+  ports:
+  - port: 30002
+    protocol: TCP
+    targetPort: test-port
+  selector:
+    app: test
+  type: ClusterIP
