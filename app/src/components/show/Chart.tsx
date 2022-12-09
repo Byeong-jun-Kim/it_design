@@ -37,7 +37,7 @@ const ShowCharts = ({ecgData, ppgData, finished}: {ecgData: number[]; ppgData: n
   const tailwind = useTailwind();
   const updateChartInterval = useSettingState(state => state.updateChartInterval);
 
-  const [updateChart, setUpdateChart] = useState<number>(0);
+  const [updateChart, setUpdateChart] = useState<number>(1);
   const [updatedChart, setUpdatedChart] = useState<number>(0);
   const [ppgChartData, setPpgChartData] = useState<number[]>([]);
   const [ecgChartData, setEcgChartData] = useState<number[]>([]);

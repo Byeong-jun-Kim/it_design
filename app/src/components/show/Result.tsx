@@ -8,14 +8,15 @@ import {toInt} from '../../utils/common';
 import useSettingState from '../../store/settingState';
 import {SERVICE_UUID, TX_UUID} from '../../utils/constants';
 
-const Result = ({ppgData, ecgData}: {ppgData: number[]; ecgData: number[]}) => {
+const Result = ({ppgData, ecgData, update}: {ppgData: number[]; ecgData: number[]; update: boolean}) => {
   const tailwind = useTailwind();
-  const [samplingRate, ptt0, sbp0, dbp0, feedbackThreshold] = useSettingState(state => [
+  const [samplingRate, ptt0, sbp0, dbp0, feedbackThreshold, feedbackDuration] = useSettingState(state => [
     state.samplingRate,
     state.ptt0,
     state.sbp0,
     state.dbp0,
     state.feedbackThreshold,
+    state.feedbackDuration,
   ]);
   const peripheral = usePeripheralState(state => state.connected);
 
@@ -44,17 +45,21 @@ const Result = ({ppgData, ecgData}: {ppgData: number[]; ecgData: number[]}) => {
   }, [ecgData, ppgData, samplingRate, ptt0, sbp0, dbp0]);
 
   const handleFeedback = useCallback(async () => {
+    if (!update) {
+      return;
+    }
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
     if (peripheral && bloodPressure >= feedbackThreshold) {
       await BleManager.write(peripheral.id, SERVICE_UUID, TX_UUID, [1]);
-      const id = setTimeout(() => BleManager.write(peripheral.id, SERVICE_UUID, TX_UUID, [0]), 30 * 1000);
+      const id = setTimeout(() => BleManager.write(peripheral.id, SERVICE_UUID, TX_UUID, [0]), feedbackDuration * 1000);
       setTimeoutId(id);
     } else if (peripheral) {
       await BleManager.write(peripheral.id, SERVICE_UUID, TX_UUID, [0]);
     }
-  }, [bloodPressure, feedbackThreshold, peripheral, timeoutId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bloodPressure, feedbackDuration, feedbackThreshold, peripheral, update]);
 
   useEffect(() => {
     handleFeedback();

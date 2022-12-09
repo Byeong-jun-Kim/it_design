@@ -29,6 +29,8 @@ const Show = () => {
 
   const [timeoutId, setTimeoutId] = useState<number | null>(null);
 
+  const [update, setUpdate] = useState<boolean>(false);
+
   const updatePpgData = useCallback((newData: number[]) => setPpgData([...ppgData, ...newData]), [ppgData]);
   const updateEcgData = useCallback((newData: number[]) => setEcgData([...ecgData, ...newData]), [ecgData]);
 
@@ -81,12 +83,18 @@ const Show = () => {
     setEcgData([]);
   };
 
+  const handleShowSetting = () => {
+    setShowSetting(true);
+    setUpdate(false);
+  };
+
   const handleFinishedCountdown = () => {
     setState(STATE.START);
     if (peripheral?.id) {
       BleManager.startNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
       const id = setTimeout(() => {
         setState(STATE.RESULT);
+        setUpdate(true);
         BleManager.stopNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
       }, samplingTime * 1000);
       setTimeoutId(id);
@@ -124,11 +132,11 @@ const Show = () => {
             )}
           </View>
           <View style={tailwind('flex-1 items-end mx-10')}>
-            <Button onPress={() => setShowSetting(true)}>{'Setting'}</Button>
+            <Button onPress={handleShowSetting}>{'Setting'}</Button>
           </View>
         </View>
         <ShowCharts ecgData={ecgData} ppgData={ppgData} finished={state !== STATE.START} />
-        {state === STATE.RESULT && <Result ppgData={ppgData} ecgData={ecgData} />}
+        {state === STATE.RESULT && <Result ppgData={ppgData} ecgData={ecgData} update={update} />}
       </View>
     </SafeAreaView>
   );

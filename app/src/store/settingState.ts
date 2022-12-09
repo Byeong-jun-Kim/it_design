@@ -5,6 +5,7 @@ export interface ISettingState {
   samplingTime: number;
   dataCount: number;
   feedbackThreshold: number;
+  feedbackDuration: number;
   ptt0: number;
   sbp0: number;
   dbp0: number;
@@ -15,6 +16,7 @@ export interface ISettingState {
   setSamplingTime: (samplingTime: number) => void;
   setDataCount: (bytes: number) => void;
   setFeedbackThreshold: (threshold: number) => void;
+  setFeedbackDuration: (feedbackDuration: number) => void;
   setPtt0: (ptt0: number) => void;
   setSbp0: (sbp0: number) => void;
   setDbp0: (dbp0: number) => void;
@@ -32,6 +34,7 @@ const useSettingState = create<ISettingState>()(set => ({
   sbp0: 112,
   dbp0: 88,
   feedbackThreshold: 100,
+  feedbackDuration: 30,
   countdown: 5,
   chartInterval: 2,
   setSamplingRate: (samplingRate: number) => set({samplingRate}),
@@ -42,6 +45,7 @@ const useSettingState = create<ISettingState>()(set => ({
   setSbp0: (sbp0: number) => set({sbp0}),
   setDbp0: (dbp0: number) => set({dbp0}),
   setFeedbackThreshold: (feedbackThreshold: number) => set({feedbackThreshold}),
+  setFeedbackDuration: (feedbackDuration: number) => set({feedbackDuration}),
   setCountDown: (countdown: number) => set({countdown}),
   setChartInterval: (chartInterval: number) => set({chartInterval}),
 }));

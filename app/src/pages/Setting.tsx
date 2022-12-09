@@ -63,6 +63,12 @@ const Setting = ({goBack}: {goBack: () => void}) => {
             value={state.feedbackThreshold}
             setValue={state.setFeedbackThreshold}
           />
+          <Row
+            label="Feedback Duration(sec)"
+            isInt={true}
+            value={state.feedbackDuration}
+            setValue={state.setFeedbackDuration}
+          />
           <Row label="PTT 0(sec)" isInt={false} value={state.ptt0} setValue={state.setPtt0} />
           <Row label="SBP 0" isInt={true} value={state.sbp0} setValue={state.setSbp0} />
           <Row label="DBP 0" isInt={true} value={state.dbp0} setValue={state.setDbp0} />
